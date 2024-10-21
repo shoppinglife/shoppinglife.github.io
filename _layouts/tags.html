@@ -9,35 +9,31 @@ author_profile: true
 
 <h2>All Tags</h2>
 <ul class="tag-list">
-  {% assign tags_sorted = site.tags | sort %}
-  {% for tag in tags_sorted %}
-    {% assign tag_name = tag[0] | strip %}
+  {% assign tags_list = site.tags | sort %}
+  {% for tag in tags_list %}
+    {% assign tag_name = tag[0] %}
     {% assign posts_count = tag[1] | size %}
-    {% if tag_name.size > 0 %}
-      <li>
-        <a href="#{{ tag_name | url_encode | cgi_escape }}">
-          {{ tag_name }} <span class="count">({{ posts_count }})</span>
-        </a>
-      </li>
-    {% endif %}
+    <li>
+      <a href="#{{ tag_name | slugify }}">
+        {{ tag_name }} <span class="count">({{ posts_count }})</span>
+      </a>
+    </li>
   {% endfor %}
 </ul>
 
 <h2>Posts by Tag</h2>
-{% for tag in tags_sorted %}
-  {% assign tag_name = tag[0] | strip %}
-  {% if tag_name.size > 0 %}
-    <section id="{{ tag_name | url_encode | cgi_escape }}">
-      <h3>{{ tag_name }}</h3>
-      <ul>
-        {% assign posts = tag[1] | sort: 'date' | reverse %}
-        {% for post in posts %}
-          <li>
-            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-            <small>({{ post.date | date: "%Y-%m-%d" }})</small>
-          </li>
-        {% endfor %}
-      </ul>
-    </section>
-  {% endif %}
+{% for tag in tags_list %}
+  {% assign tag_name = tag[0] %}
+  <section id="{{ tag_name | slugify }}">
+    <h3>{{ tag_name }}</h3>
+    <ul>
+      {% assign posts = tag[1] | reverse %}
+      {% for post in posts %}
+        <li>
+          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+          <small>({{ post.date | date: "%Y-%m-%d" }})</small>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
 {% endfor %}
