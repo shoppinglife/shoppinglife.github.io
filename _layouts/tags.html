@@ -1,5 +1,5 @@
 ---
-layout: archive
+layout: single
 title: "Posts by Tag"
 permalink: /tags/
 author_profile: true
@@ -15,45 +15,28 @@ author_profile: true
 
 {% assign sorted_tag_names = tag_names | sort_natural %}
 
-<ul class="taxonomy__index">
-  {% for i in (1..tags_max) reversed %}
-    {% for tag in site.tags %}
-      {% if tag[1].size == i %}
-        <li>
-          <a href="#{{ tag[0] | slugify }}">
-            <strong>{{ tag[0] }}</strong> <span class="taxonomy__count">{{ i }}</span>
-          </a>
-        </li>
-      {% endif %}
-    {% endfor %}
+<h2>All Tags</h2>
+<ul class="tag-list">
+  {% for tag_name in sorted_tag_names %}
+    <li>
+      <a href="#{{ tag_name | inspect | slice: 1, -1 | url_encode | replace: '+', '%20' }}">
+        {{ tag_name }} <span class="count">({{ site.tags[tag_name].size }})</span>
+      </a>
+    </li>
   {% endfor %}
 </ul>
 
-{% for i in (1..tags_max) reversed %}
-  {% for tag in site.tags %}
-    {% if tag[1].size == i %}
-      <section id="{{ tag[0] | slugify | downcase }}" class="taxonomy__section">
-        <h2 class="archive__subtitle">{{ tag[0] }}</h2>
-        <div class="entries-{{ page.entries_layout | default: 'list' }}">
-          {% for post in tag.last %}
-          <article class="archive-item">
-            <div class="archive__item_tag"> <!-- class 추가 -->
-                <span>
-                  <a href="{{ post.url }}">{{post.title}}</a>&nbsp
-                </span>
-                <small> 
-                  <i class="fas fa-fw fa-calendar-alt" aria-hidden="true"> </i>{{ post.date | date: " %Y.%m.%d" }}
-                  <br>
-                  {% if site.category_archive.type and post.categories[0] and site.tag_archive.type and post.tags[0] %}
-                    {%- include post__taxonomy.html -%}
-                  {% endif %}
-                </small>
-            </div>
-          </article>
-          {% endfor %}
-        </div>
-        <a href="#page-title" class="back-to-top">{{ site.data.ui-text[site.locale].back_to_top | default: 'Back to Top' }} &uarr;</a>
-      </section>
-    {% endif %}
-  {% endfor %}
+<h2>Posts by Tag</h2>
+{% for tag_name in sorted_tag_names %}
+  <section id="{{ tag_name | inspect | slice: 1, -1 | url_encode | replace: '+', '%20' }}">
+    <h3>{{ tag_name }}</h3>
+    <ul>
+      {% for post in site.tags[tag_name] %}
+        <li>
+          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+          <small>({{ post.date | date: "%Y-%m-%d" }})</small>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
 {% endfor %}
