@@ -255,7 +255,10 @@ compress_html:
   clippings: all
   ignore:
     envs: development
-
+    
+liquid:
+  error_mode: strict
+  strict_filters: true
 
 # Defaults
 defaults:
