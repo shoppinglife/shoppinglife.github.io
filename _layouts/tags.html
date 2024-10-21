@@ -16,9 +16,11 @@ layout: archive
     {% for tag in site.tags %}
       {% if tag[1].size == i %}
         <li>
-          <a href="#{{ tag[0] | tostring | slugify }}">
-            <strong>{{ tag[0] }}</strong> <span class="taxonomy__count">{{ i }}</span>
-          </a>
+          {% if tag[0] %}  <!-- tag[0] 값이 존재하는지 확인 -->
+            <a href="#{{ tag[0] | slugify }}">
+              <strong>{{ tag[0] }}</strong> <span class="taxonomy__count">{{ i }}</span>
+            </a>
+          {% endif %}
         </li>
       {% endif %}
     {% endfor %}
@@ -28,28 +30,30 @@ layout: archive
 {% for i in (1..tags_max) reversed %}
   {% for tag in site.tags %}
     {% if tag[1].size == i %}
-      <section id="{{ tag[0] | tostring | slugify | downcase }}" class="taxonomy__section">
-        <h2 class="archive__subtitle">{{ tag[0] }}</h2>
-        <div class="entries-{{ page.entries_layout | default: 'list' }}">
-          {% for post in tag.last %}
-          <article class="archive-item">
-            <div class="archive__item_tag">
-                <span>
-                  <a href="{{ post.url }}">{{ post.title }}</a>&nbsp
-                </span>
-                <small> 
-                  <i class="fas fa-fw fa-calendar-alt" aria-hidden="true"> </i>{{ post.date | date: " %Y.%m.%d" }}
-                  <br>
-                  {% if site.category_archive.type and post.categories[0] and site.tag_archive.type and post.tags[0] %}
-                    {%- include post__taxonomy.html -%}
-                  {% endif %}
-                </small>
-            </div>
-          </article>
-          {% endfor %}
-        </div>
-        <a href="#page-title" class="back-to-top">{{ site.data.ui-text[site.locale].back_to_top | default: 'Back to Top' }} &uarr;</a>
-      </section>
+      {% if tag[0] %}  <!-- tag[0] 값이 존재하는지 확인 -->
+        <section id="{{ tag[0] | slugify | downcase }}" class="taxonomy__section">
+          <h2 class="archive__subtitle">{{ tag[0] }}</h2>
+          <div class="entries-{{ page.entries_layout | default: 'list' }}">
+            {% for post in tag.last %}
+            <article class="archive-item">
+              <div class="archive__item_tag"> <!-- class 추가 -->
+                  <span>
+                    <a href="{{ post.url }}">{{ post.title }}</a>&nbsp
+                  </span>
+                  <small> 
+                    <i class="fas fa-fw fa-calendar-alt" aria-hidden="true"> </i>{{ post.date | date: " %Y.%m.%d" }}
+                    <br>
+                    {% if site.category_archive.type and post.categories[0] and site.tag_archive.type and post.tags[0] %}
+                      {%- include post__taxonomy.html -%}
+                    {% endif %}
+                  </small>
+              </div>
+            </article>
+            {% endfor %}
+          </div>
+          <a href="#page-title" class="back-to-top">{{ site.data.ui-text[site.locale].back_to_top | default: 'Back to Top' }} &uarr;</a>
+        </section>
+      {% endif %}
     {% endif %}
   {% endfor %}
 {% endfor %}
