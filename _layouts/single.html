@@ -1,77 +1,54 @@
 ---
-layout: default
+layout: archive
+title: "Posts by Tag"
+permalink: /tags/
+author_profile: true
 ---
 
-<div id="main" role="main">
-  {% include sidebar.html %}
+{{ content }}
 
-  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
-    {% if page.title %}
-      <meta itemprop="headline" content="{{ page.title | markdownify | strip_html | strip_newlines | escape_once }}">
-    {% endif %}
-
-    <div class="page__inner-wrap">
-      <header class="page__header">
-        {% if page.title %}
-          <h1 class="page__title" itemprop="headline">{{ page.title | markdownify | remove: "<p>" | remove: "</p>" }}</h1>
-        {% endif %}
-      </header>
-
-      <section class="page__content" itemprop="text">
-        {{ content }}
-      </section>
-
-      <footer class="page__meta">
-        {% if page.categories %}
-          <div class="page__taxonomy">
-            <strong><i class="fas fa-folder-open" aria-hidden="true"></i> Categories:</strong>
-            <span itemprop="keywords">
-              {% for category in page.categories %}
-                {% assign category_string = category | escape %}
-                <a href="{{ '/categories/#' | append: category_string | relative_url }}" class="page__taxonomy-item">{{ category }}</a>{% unless forloop.last %}, {% endunless %}
-              {% endfor %}
-            </span>
-          </div>
-        {% endif %}
-
-        {% if page.tags %}
-          <div class="page__taxonomy">
-            <strong><i class="fas fa-tags" aria-hidden="true"></i> Tags:</strong>
-            <span itemprop="keywords">
-              {% for tag in page.tags %}
-                {% assign tag_string = tag | escape %}
-                <a href="{{ '/tags/#' | append: tag_string | relative_url }}" class="page__taxonomy-item">{{ tag }}</a>{% unless forloop.last %}, {% endunless %}
-              {% endfor %}
-            </span>
-          </div>
-        {% endif %}
-
-        {% if page.date %}
-          <p class="page__date">
-            <strong>Published:</strong> 
-            <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %d, %Y" }}</time>
-          </p>
-        {% endif %}
-      </footer>
-
-      {% if page.share %}{% include social-share.html %}{% endif %}
-
-      {% include post_pagination.html %}
-    </div>
-
-    {% if jekyll.environment == 'production' and site.comments.provider and page.comments %}
-      {% include comments.html %}
-    {% endif %}
-  </article>
-
-  {% if page.id and page.related and site.related_posts.size > 0 %}
-    <div class="page__related">
-      <h4 class="page__related-title">{{ site.data.ui-text[site.locale].related_label | default: "You May Also Enjoy" }}</h4>
-      <div class="grid__wrapper">
-        {% for post in site.related_posts limit:4 %}
-          {% include archive-single.html type="grid" %}
-        {% endfor %}
-      </div>
-    </div>
+{% assign tags_max = 0 %}
+{% for tag in site.tags %}
+  {% if tag[1].size > tags_max %}
+    {% assign tags_max = tag[1].size %}
   {% endif %}
-</div>
+{% endfor %}
+
+<h2>All Tags</h2>
+<ul class="tag-list">
+  {% for i in (1..tags_max) reversed %}
+    {% for tag in site.tags %}
+      {% if tag[1].size == i %}
+        <li>
+          {% capture tag_name %}{{ tag[0] | strip }}{% endcapture %}
+          {% if tag_name.size > 0 %}
+            {% assign tag_id = tag_name | escape %}
+            <a href="#{{ tag_id }}">
+              {{ tag_name }}
+              <span class="count">({{ tag[1].size }})</span>
+            </a>
+          {% endif %}
+        </li>
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+</ul>
+
+<h2>Posts by Tag</h2>
+{% for tag in site.tags %}
+  {% capture tag_name %}{{ tag[0] | strip }}{% endcapture %}
+  {% if tag_name.size > 0 %}
+    {% assign tag_id = tag_name | escape %}
+    <section id="{{ tag_id }}">
+      <h3>{{ tag_name }}</h3>
+      <ul>
+        {% for post in tag[1] %}
+          <li>
+            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+            <small>({{ post.date | date: "%Y-%m-%d" }})</small>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+{% endfor %}
