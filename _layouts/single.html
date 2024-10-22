@@ -15,11 +15,6 @@ layout: default
         {% if page.title %}
           <h1 class="page__title" itemprop="headline">{{ page.title | markdownify | remove: "<p>" | remove: "</p>" }}</h1>
         {% endif %}
-        {% if page.read_time %}
-          <p class="page__meta">
-            <i class="far fa-clock" aria-hidden="true"></i> {% include read-time.html %}
-          </p>
-        {% endif %}
       </header>
 
       <section class="page__content" itemprop="text">
@@ -32,7 +27,8 @@ layout: default
             <strong><i class="fas fa-folder-open" aria-hidden="true"></i> Categories:</strong>
             <span itemprop="keywords">
               {% for category in page.categories %}
-                <a href="{{ category | slugify | prepend: '/categories/#' | relative_url }}" class="page__taxonomy-item">{{ category }}</a>{% unless forloop.last %}, {% endunless %}
+                {% assign category_string = category | escape %}
+                <a href="{{ '/categories/#' | append: category_string | relative_url }}" class="page__taxonomy-item">{{ category }}</a>{% unless forloop.last %}, {% endunless %}
               {% endfor %}
             </span>
           </div>
@@ -43,18 +39,18 @@ layout: default
             <strong><i class="fas fa-tags" aria-hidden="true"></i> Tags:</strong>
             <span itemprop="keywords">
               {% for tag in page.tags %}
-                {% if tag %}
-                  <a href="{{ tag | slugify | prepend: '/tags/#' | relative_url }}" class="page__taxonomy-item">{{ tag }}</a>{% unless forloop.last %}, {% endunless %}
-                {% endif %}
+                {% assign tag_string = tag | escape %}
+                <a href="{{ '/tags/#' | append: tag_string | relative_url }}" class="page__taxonomy-item">{{ tag }}</a>{% unless forloop.last %}, {% endunless %}
               {% endfor %}
             </span>
           </div>
         {% endif %}
 
-        {% if page.modified %}
-          <p class="page__date"><strong>Updated:</strong> <time class="dt-published" datetime="{{ page.modified | date_to_xmlschema }}">{{ page.modified | date: "%B %d, %Y" }}</time></p>
-        {% elsif page.date %}
-          <p class="page__date"><strong>Published:</strong> <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %d, %Y" }}</time></p>
+        {% if page.date %}
+          <p class="page__date">
+            <strong>Published:</strong> 
+            <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %d, %Y" }}</time>
+          </p>
         {% endif %}
       </footer>
 
@@ -63,14 +59,14 @@ layout: default
       {% include post_pagination.html %}
     </div>
 
-    {% if page.comments %}
+    {% if jekyll.environment == 'production' and site.comments.provider and page.comments %}
       {% include comments.html %}
     {% endif %}
   </article>
 
-  {% if page.related %}
+  {% if page.id and page.related and site.related_posts.size > 0 %}
     <div class="page__related">
-      <h2>Related Posts</h2>
+      <h4 class="page__related-title">{{ site.data.ui-text[site.locale].related_label | default: "You May Also Enjoy" }}</h4>
       <div class="grid__wrapper">
         {% for post in site.related_posts limit:4 %}
           {% include archive-single.html type="grid" %}
